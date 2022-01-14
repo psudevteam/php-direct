@@ -1,10 +1,10 @@
 <?php
 // Include config file
-require_once "config.php";
+require_once "../config/index.php";
  
 // Define variables and initialize with empty values
-$name = $address = $salary = "";
-$name_err = $address_err = $salary_err = "";
+$name = $birth_date = $age = $gender = "";
+$name_err = $birth_date_err = $age_err = $gender_err = "";
  
 // Processing form data when form is submitted
 if(isset($_POST["id"]) && !empty($_POST["id"])){
@@ -21,43 +21,45 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
         $name = $input_name;
     }
     
-    // Validate address address
-    $input_address = trim($_POST["address"]);
-    if(empty($input_address)){
-        $address_err = "Please enter an address.";     
-    } else{
-        $address = $input_address;
-    }
+    $input_birth_date = trim($_POST["birth_date"]);
+    $birth_date = $input_birth_date;
     
-    // Validate salary
-    $input_salary = trim($_POST["salary"]);
-    if(empty($input_salary)){
-        $salary_err = "Please enter the salary amount.";     
-    } elseif(!ctype_digit($input_salary)){
-        $salary_err = "Please enter a positive integer value.";
+
+    $input_age = trim($_POST["age"]);
+    if(empty($input_age)){
+        $address_err = "Masukan Umur Anda : ";
     } else{
-        $salary = $input_salary;
+        $age = $input_age;
     }
+
+    $input_gender = trim($_POST["gender"]);
+    if(empty($input_gender)){
+        $address_err = "Masukan Jenis Kelamin : ";
+    } else{
+        $gender = $input_gender;
+    }
+
     
     // Check input errors before inserting in database
-    if(empty($name_err) && empty($address_err) && empty($salary_err)){
+    if(empty($name_err) && empty($birth_date_err) && empty($age_err) && empty($gender_err)){
         // Prepare an update statement
-        $sql = "UPDATE employees SET name=?, address=?, salary=? WHERE id=?";
+        $sql = "UPDATE singer SET name=?, birth_date=?, age=?, gender=? WHERE id=?";
          
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "sssi", $param_name, $param_address, $param_salary, $param_id);
+            mysqli_stmt_bind_param($stmt, "sssss", $param_name, $param_birth_date, $param_age, $param_gender, $param_id);
             
             // Set parameters
             $param_name = $name;
-            $param_address = $address;
-            $param_salary = $salary;
+            $param_birth_date = $birth_date;
+            $param_age = $age;
+            $param_gender = $gender;
             $param_id = $id;
             
             // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
                 // Records updated successfully. Redirect to landing page
-                header("location: index.php");
+                header("location: ../index.php");
                 exit();
             } else{
                 echo "Something went wrong. Please try again later.";
@@ -77,7 +79,7 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
         $id =  trim($_GET["id"]);
         
         // Prepare a select statement
-        $sql = "SELECT * FROM employees WHERE id = ?";
+        $sql = "SELECT * FROM singer WHERE id = ?";
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
             mysqli_stmt_bind_param($stmt, "i", $param_id);
@@ -96,8 +98,9 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
                     
                     // Retrieve individual field value
                     $name = $row["name"];
-                    $address = $row["address"];
-                    $salary = $row["salary"];
+                    $birth_date = $row["birth_date"];
+                    $age = $row["age"];
+                    $gender = $row["gender"];
                 } else{
                     // URL doesn't contain valid id. Redirect to error page
                     header("location: error.php");
@@ -150,19 +153,24 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
                             <input type="text" name="name" class="form-control" value="<?php echo $name; ?>">
                             <span class="help-block"><?php echo $name_err;?></span>
                         </div>
-                        <div class="form-group <?php echo (!empty($address_err)) ? 'has-error' : ''; ?>">
-                            <label>Address</label>
-                            <textarea name="address" class="form-control"><?php echo $address; ?></textarea>
-                            <span class="help-block"><?php echo $address_err;?></span>
+                        <div class="form-group <?php echo (!empty($birth_date_err)) ? 'has-error' : ''; ?>">
+                            <label>Tanggal Lahir</label>
+                            <input type="date" name="birth_date" class="form-control" value="<?php echo $birth_date; ?>">
+                            <span class="help-block"><?php echo $birth_date_err;?></span>
                         </div>
-                        <div class="form-group <?php echo (!empty($salary_err)) ? 'has-error' : ''; ?>">
-                            <label>Salary</label>
-                            <input type="text" name="salary" class="form-control" value="<?php echo $salary; ?>">
-                            <span class="help-block"><?php echo $salary_err;?></span>
+                        <div class="form-group <?php echo (!empty($age_err)) ? 'has-error' : ''; ?>">
+                            <label>Age</label>
+                            <input type="text" name="age" class="form-control" value="<?php echo $age; ?>">
+                            <span class="help-block"><?php echo $age_err;?></span>
+                        </div>
+                        <div class="form-group <?php echo (!empty($gender_err)) ? 'has-error' : ''; ?>">
+                            <label>Gender</label>
+                            <input type="text" name="gender" class="form-control" value="<?php echo $gender; ?>">
+                            <span class="help-block"><?php echo $gender_err;?></span>
                         </div>
                         <input type="hidden" name="id" value="<?php echo $id; ?>"/>
                         <input type="submit" class="btn btn-primary" value="Submit">
-                        <a href="index.php" class="btn btn-default">Cancel</a>
+                        <a href="../index.php" class="btn btn-default">Cancel</a>
                     </form>
                 </div>
             </div>        
